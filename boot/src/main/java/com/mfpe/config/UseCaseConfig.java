@@ -1,10 +1,7 @@
 package com.mfpe.config;
 
 import com.mfpe.port.in.*;
-import com.mfpe.port.out.FindOrderByIdPort;
-import com.mfpe.port.out.InventoryService;
-import com.mfpe.port.out.PaymentGateway;
-import com.mfpe.port.out.SaveOrderPort;
+import com.mfpe.port.out.*;
 import com.mfpe.service.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,14 +24,16 @@ public class UseCaseConfig {
     @Bean
     public PayOrderUseCase payOrderUseCase(FindOrderByIdPort findOrderByIdPort,
                                            PaymentGateway paymentGateway,
-                                           SaveOrderPort saveOrderPort){
-        return new PayOrderService(findOrderByIdPort, paymentGateway, saveOrderPort);
+                                           SaveOrderPort saveOrderPort,
+                                           NotificationService notificationService){
+        return new PayOrderService(findOrderByIdPort, paymentGateway, saveOrderPort, notificationService);
     }
 
     @Bean
     public CancelOrderUseCase cancelOrderUseCase(FindOrderByIdPort findOrderByIdPort,
-                                              SaveOrderPort saveOrderPort){
-        return new CancelOrderService(findOrderByIdPort, saveOrderPort);
+                                                 SaveOrderPort saveOrderPort,
+                                                 NotificationService notificationService){
+        return new CancelOrderService(findOrderByIdPort, saveOrderPort, notificationService);
     }
 
     @Bean

@@ -83,7 +83,7 @@ El alumno debe integrar un **nuevo adaptador de salida** que represente un servi
 
 ### Opción A - Servicio de Notificaciones
 
-Implementar un puerto de salida `NotificationService` que se invoque cuando una orden cambie de estado (por ejemplo, al pagarse o cancelarse).
+Implementar un puerto de salida `SimulatedNotificationService` que se invoque cuando una orden cambie de estado (por ejemplo, al pagarse o cancelarse).
 
 | Archivo | Módulo | Descripción |
 |---|---|---|
