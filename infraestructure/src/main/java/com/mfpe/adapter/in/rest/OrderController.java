@@ -7,14 +7,15 @@ import com.mfpe.adapter.in.rest.dto.OrderResponseMapper;
 import com.mfpe.command.AddItemToOrderCommand;
 import com.mfpe.command.CreateOrderCommand;
 import com.mfpe.model.entity.Order;
-import com.mfpe.model.vo.OrderId;
-import com.mfpe.port.in.*;
+import com.mfpe.port.in.AddItemToOrderUseCase;
+import com.mfpe.port.in.CancelOrderUseCase;
+import com.mfpe.port.in.CreateOrderUseCase;
+import com.mfpe.port.in.PayOrderUseCase;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -25,20 +26,17 @@ public class OrderController {
     private final PayOrderUseCase payOrderUseCase;
     private final CancelOrderUseCase cancelOrderUseCase;
     private final OrderResponseMapper responseMapper;
-    private final GetOrderByIdUseCase getOrderByIdUseCase;
 
     public OrderController(CreateOrderUseCase createOrderUseCase,
                            AddItemToOrderUseCase addItemToOrderUseCase,
                            PayOrderUseCase payOrderUseCase,
                            CancelOrderUseCase cancelOrderUseCase,
-                           OrderResponseMapper responseMapper,
-                           GetOrderByIdUseCase getOrderByIdUseCase) {
+                           OrderResponseMapper responseMapper) {
         this.createOrderUseCase = createOrderUseCase;
         this.addItemToOrderUseCase = addItemToOrderUseCase;
         this.payOrderUseCase = payOrderUseCase;
         this.cancelOrderUseCase = cancelOrderUseCase;
         this.responseMapper = responseMapper;
-        this.getOrderByIdUseCase = getOrderByIdUseCase;
     }
 
     @PostMapping
@@ -86,10 +84,4 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<OrderResponse> getOrderById(@PathVariable String id) {
-        // Pasamos directamente el String en vez de un VO para seguir con la consistencia de los métodos de payOrder y cancelOrder
-        Order order = getOrderByIdUseCase.getOrderById(new OrderId(UUID.fromString(id)));
-        return ResponseEntity.ok(responseMapper.toResponse(order));
-    }
 }
