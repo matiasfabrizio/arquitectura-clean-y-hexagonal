@@ -1,17 +1,11 @@
 package com.mfpe.config;
 
-import com.mfpe.port.in.AddItemToOrderUseCase;
-import com.mfpe.port.in.CancelOrderUseCase;
-import com.mfpe.port.in.CreateOrderUseCase;
-import com.mfpe.port.in.PayOrderUseCase;
+import com.mfpe.port.in.*;
 import com.mfpe.port.out.FindOrderByIdPort;
 import com.mfpe.port.out.InventoryService;
 import com.mfpe.port.out.PaymentGateway;
 import com.mfpe.port.out.SaveOrderPort;
-import com.mfpe.service.AddItemToOrderService;
-import com.mfpe.service.CancelOrderService;
-import com.mfpe.service.CreateOrderService;
-import com.mfpe.service.PayOrderService;
+import com.mfpe.service.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -43,4 +37,8 @@ public class UseCaseConfig {
         return new CancelOrderService(findOrderByIdPort, saveOrderPort);
     }
 
+    @Bean
+    public GetOrderByIdUseCase getOrderByIdUseCase(FindOrderByIdPort port) {
+        return new GetOrderByIdService(port);
+    }
 }
