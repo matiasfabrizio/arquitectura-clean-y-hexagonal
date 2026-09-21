@@ -8,6 +8,7 @@ import com.mfpe.model.enums.OrderStatus;
 import com.mfpe.model.vo.Money;
 import com.mfpe.model.vo.OrderId;
 import com.mfpe.port.out.FindOrderByIdPort;
+import com.mfpe.port.out.NotificationService;
 import com.mfpe.port.out.SaveOrderPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +38,9 @@ class CancelOrderServiceTest {
 
     @Mock
     private SaveOrderPort saveOrderPort;
+
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private CancelOrderService cancelOrderService;

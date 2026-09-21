@@ -7,12 +7,11 @@ import com.mfpe.adapter.in.rest.dto.OrderResponse;
 import com.mfpe.adapter.in.rest.dto.OrderResponseMapper;
 import com.mfpe.command.AddItemToOrderCommand;
 import com.mfpe.command.CreateOrderCommand;
+import com.mfpe.exception.OrderNotFoundException;
 import com.mfpe.model.entity.Order;
 import com.mfpe.model.enums.OrderStatus;
-import com.mfpe.port.in.AddItemToOrderUseCase;
-import com.mfpe.port.in.CancelOrderUseCase;
-import com.mfpe.port.in.CreateOrderUseCase;
-import com.mfpe.port.in.PayOrderUseCase;
+import com.mfpe.model.vo.OrderId;
+import com.mfpe.port.in.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,12 +27,10 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OrderControllerTest {
@@ -54,6 +51,9 @@ class OrderControllerTest {
 
     @Mock
     private OrderResponseMapper responseMapper;
+
+    @Mock
+    private GetOrderByIdUseCase  getOrderByIdUseCase;
 
     @InjectMocks
     private OrderController controller;
@@ -187,5 +187,45 @@ class OrderControllerTest {
         // Assert
         assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
         verify(cancelOrderUseCase).cancelOrder(ORDER_ID);
+    }
+
+    @Test
+    void getOrderById_shouldReturn200WithMappedResponse_whenOrderExists() {
+        // Arrange
+        Order order = Order.create("customer-1");
+        OrderResponse response = createOrderResponse();
+        when(getOrderByIdUseCase.getOrderById(any(OrderId.class))).thenReturn(order);
+        when(responseMapper.toResponse(order)).thenReturn(response);
+
+        // Act
+        ResponseEntity<OrderResponse> result = controller.getOrderById(ORDER_ID);
+
+        // Assert
+        assertEquals(HttpStatus.OK, result.getStatusCode());
+        assertSame(response, result.getBody());
+    }
+
+    @Test
+    void getOrderById_shouldPropagateNotFound_whenOrderDoesNotExist() {
+        // Arrange
+        when(getOrderByIdUseCase.getOrderById(any(OrderId.class))).thenThrow(new OrderNotFoundException(ORDER_ID));
+
+        // Act + Assert
+        assertThrows(OrderNotFoundException.class, () -> controller.getOrderById(ORDER_ID));
+        verify(responseMapper, never()).toResponse(any());
+    }
+
+    @Test
+    void getOrderById_shouldPassPathVariableAsOrderId_whenOrderExists() {
+        // Arrange
+        Order order = Order.create("customer-1");
+        when(getOrderByIdUseCase.getOrderById(any(OrderId.class))).thenReturn(order);
+
+        // Act
+        controller.getOrderById(ORDER_ID);
+
+        // Assert
+        verify(getOrderByIdUseCase).getOrderById(
+                argThat(id -> id.value().toString().equals(ORDER_ID)));
     }
 }
